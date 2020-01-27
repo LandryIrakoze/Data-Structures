@@ -15,7 +15,7 @@ class Queue:
         self.storage.add_to_tail(value)
 
     def dequeue(self):
-        if self.storage.__len__() != 0:
+        if self.size != 0:
             self.size -= 1
             return self.storage.remove_from_head()
         else:
