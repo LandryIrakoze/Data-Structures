@@ -11,10 +11,10 @@ class LRUCache:
     to every node stored in the cache.
     """
     def __init__(self, limit=10):
-        self.max = limit
+        self.limit = limit
         self.size = 0
-        self.doubly_linked_list = DoublyLinkedList()
-        self.storage_dict = {} 
+        self.order = DoublyLinkedList()
+        self.storage = {} 
 
     """
     Retrieves the value associated with the given key. Also
@@ -25,12 +25,12 @@ class LRUCache:
     """
     def get(self, key):
         # self.doubly_linked_list.add_to_head(key)
-        if key in self.storage_dict:
-            node = self.storage_dict[key]
-            self.doubly_linked_list.move_to_front(node)
+        if key in self.storage:
+            node = self.storage[key]
+            self.order.move_to_end(node)
             return node.value[1]
         else:
-            pass
+            return None
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -44,31 +44,21 @@ class LRUCache:
     """
     def set(self, key, value):
 
-        if self.size == self.max:
-            self.doubly_linked_list.remove_from_tail()
-            del self.storage_dict[key]
-            self.storage_dict[key] = value
-            self.doubly_linked_list.add_to_head(key)
-        else:
-            if key in self.storage_dict:
-                self.storage_dict[key] = value
-            else:
-                self.storage_dict[key] = value
-                self.doubly_linked_list.add_to_head(key)
-                self.size += 1
+        if key in self.storage:
+            node = self.storage[key]
+            node.value = (key, value)
+            self.order.move_to_end(node)
+            return
 
-        # if self.size != self.max:
-        #     if key in self.storage_dict:
-        #         self.storage_dict[key] = value
-        #     else:
-        #         self.storage_dict[key] = value
-        #         self.doubly_linked_list.add_to_head(key)
-        #         self.size += 1
-        # else:
-        #     self.doubly_linked_list.remove_from_tail()
-        #     del self.storage_dict[key]
-        #     self.storage_dict[key] = value
-        #     self.doubly_linked_list.add_to_head(key)
+        if self.size == self.limit:
+            del self.storage[self.order.head.value[0]]
+            self.order.remove_from_head()
+            self.size -= 1
+
+        self.order.add_to_tail((key, value))
+        self.storage[key] = self.order.tail
+        self.size += 1
+
             
 
 '''
